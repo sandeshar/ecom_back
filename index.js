@@ -1,5 +1,5 @@
 import express from 'express';
-import connectDB from './db/db.js';
+import connectDB from './helper/db.js';
 import ProductRouter from './route/products.route.js';
 import UserRouter from './route/user.route.js';
 import dotenv from 'dotenv';
@@ -12,6 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 connectDB();
 
