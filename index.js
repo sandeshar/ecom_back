@@ -1,7 +1,12 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 import connectDB from './helper/db.js';
 import ProductRouter from './route/products.route.js';
 import UserRouter from './route/user.route.js';
+import AuthRouter from './route/auth.route.js';
+import OrderRouter from './route/orders.route.js';
+import CustomerRouter from './route/customers.route.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -16,9 +21,20 @@ app.use('/uploads', express.static('uploads'));
 
 connectDB();
 
+const uploadsDir = path.resolve('uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 app.use('/products', ProductRouter);
 
 app.use('/users', UserRouter);
+
+app.use('/auth', AuthRouter);
+
+app.use('/orders', OrderRouter);
+
+app.use('/customers', CustomerRouter);
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
