@@ -7,6 +7,7 @@ import UserRouter from './route/user.route.js';
 import AuthRouter from './route/auth.route.js';
 import OrderRouter from './route/orders.route.js';
 import CustomerRouter from './route/customers.route.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -35,6 +36,12 @@ app.use('/auth', AuthRouter);
 app.use('/orders', OrderRouter);
 
 app.use('/customers', CustomerRouter);
+
+// 404 handler - must be after all routes
+app.use(notFoundHandler);
+
+// Global error handler - must be last
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {

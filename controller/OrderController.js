@@ -42,16 +42,16 @@ const buildOrderItems = async (rawItems = []) => {
     });
 };
 
-const computeTotals = (items, taxRate = DEFAULT_TAX_RATE) => {
+const computeTotals = (items, taxRate = DEFAULT_TAX_RATE, shipping = 0) => {
     const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
     const tax = Math.round(subtotal * taxRate * 100) / 100;
-    const total = subtotal + tax;
-    return { subtotal, tax, total };
+    const total = subtotal + tax + shipping;
+    return { subtotal, tax, shipping, total };
 };
 
 export const createOrder = async (req, res) => {
     try {
-        const { customer, billingAddress, items: rawItems, taxRate, notes, metadata } = req.body;
+        const { customer, billingAddress, items: rawItems, taxRate, shipping, notes, metadata } = req.body;
 
         if (!customer || !customer.name || !customer.email) {
             return res.status(400).json({ message: "Customer name and email are required" });
@@ -62,7 +62,23 @@ export const createOrder = async (req, res) => {
         }
 
         const items = await buildOrderItems(rawItems);
-        const { subtotal, tax, total } = computeTotals(items, taxRate || DEFAULT_TAX_RATE);
+        
+        // Validate product inventory
+        for (const item of items) {
+            const product = await Product.findById(item.product);
+            if (product && product.inventory !== undefined && product.inventory < item.quantity) {
+                return res.status(400).json({ 
+                    message: `Insufficient inventory for ${product.name}. Only ${product.inventory} available.` 
+                });
+            }
+        }
+
+        const shippingCost = Number(shipping) || 0;
+        const { subtotal, tax, shipping: calculatedShipping, total } = computeTotals(
+            items, 
+            taxRate || DEFAULT_TAX_RATE, 
+            shippingCost
+        );
 
         const order = await Order.create({
             orderNumber: await generateOrderNumber(),
@@ -71,12 +87,20 @@ export const createOrder = async (req, res) => {
             billingAddress,
             subtotal,
             tax,
+            shipping: calculatedShipping,
             total,
             notes,
             metadata,
             paymentStatus: "Pending",
             status: "Processing",
         });
+
+        // Optionally decrease inventory (uncomment if needed)
+        // for (const item of items) {
+        //     await Product.findByIdAndUpdate(item.product, {
+        //         $inc: { inventory: -item.quantity }
+        //     });
+        // }
 
         return res.status(201).json(order);
     } catch (error) {

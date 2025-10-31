@@ -10,14 +10,15 @@ import {
 } from "../controller/ProductController.js";
 import upload from "../helper/multerHelper.js";
 import { authenticate } from "../middleware/authMiddleware.js";
+import { validateProductInput } from "../middleware/validation.js";
 
 const ProductRouter = Router();
 
 ProductRouter.get('/', getProducts);
 ProductRouter.get('/slug/:slug', getProductBySlug);
 ProductRouter.get('/:id', getProductById);
-ProductRouter.post('/', authenticate, upload.fields([{ name: 'heroImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 5 }]), addProduct);
-ProductRouter.put('/:id', authenticate, upload.fields([{ name: 'heroImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 10 }]), updateProduct);
+ProductRouter.post('/', authenticate, upload.fields([{ name: 'heroImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 5 }]), validateProductInput, addProduct);
+ProductRouter.put('/:id', authenticate, upload.fields([{ name: 'heroImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 10 }]), validateProductInput, updateProduct);
 ProductRouter.patch('/:id/publish', authenticate, togglePublish);
 ProductRouter.delete('/:id', authenticate, deleteProduct);
 

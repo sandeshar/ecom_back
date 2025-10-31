@@ -51,6 +51,7 @@ const OrderSchema = new mongoose.Schema(
         billingAddress: { type: AddressSchema, required: true },
         subtotal: { type: Number, required: true },
         tax: { type: Number, required: true, default: 0 },
+        shipping: { type: Number, default: 0 },
         total: { type: Number, required: true },
         notes: { type: String },
         metadata: { type: Map, of: String },

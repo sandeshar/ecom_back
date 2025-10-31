@@ -8,13 +8,14 @@ import {
     updateOrderStatus,
 } from "../controller/OrderController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
+import { validateOrderInput } from "../middleware/validation.js";
 
 const OrderRouter = Router();
 
 OrderRouter.get("/", authenticate, getOrders);
 OrderRouter.get("/stats", authenticate, getOrderStats);
 OrderRouter.get("/:id", authenticate, getOrderById);
-OrderRouter.post("/", createOrder);
+OrderRouter.post("/", validateOrderInput, createOrder);
 OrderRouter.patch("/:id/status", authenticate, updateOrderStatus);
 OrderRouter.delete("/:id", authenticate, deleteOrder);
 
