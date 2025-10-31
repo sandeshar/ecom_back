@@ -62,21 +62,21 @@ export const createOrder = async (req, res) => {
         }
 
         const items = await buildOrderItems(rawItems);
-        
+
         // Validate product inventory
         for (const item of items) {
             const product = await Product.findById(item.product);
             if (product && product.inventory !== undefined && product.inventory < item.quantity) {
-                return res.status(400).json({ 
-                    message: `Insufficient inventory for ${product.name}. Only ${product.inventory} available.` 
+                return res.status(400).json({
+                    message: `Insufficient inventory for ${product.name}. Only ${product.inventory} available.`
                 });
             }
         }
 
         const shippingCost = Number(shipping) || 0;
         const { subtotal, tax, shipping: calculatedShipping, total } = computeTotals(
-            items, 
-            taxRate || DEFAULT_TAX_RATE, 
+            items,
+            taxRate || DEFAULT_TAX_RATE,
             shippingCost
         );
 
