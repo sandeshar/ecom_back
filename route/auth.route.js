@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { login } from "../controller/AuthController.js";
+import { adminLogin } from "../controller/AdminController.js";
 
 const AuthRouter = Router();
 
-AuthRouter.post("/login", login);
+// Use the new admin login system
+AuthRouter.post("/login", adminLogin);
 
 export default AuthRouter;
