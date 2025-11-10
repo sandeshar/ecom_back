@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "create-superadmin": "node scripts/createSuperAdmin.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
